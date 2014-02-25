@@ -18,34 +18,65 @@ from xmlsec.exceptions import XMLSigException
 from UserDict import DictMixin
 from xmlsec import constants
 from xmlsec.utils import parse_xml, pem2b64, unescape_xml_entities, delete_elt, root_elt, b64d, b64e, b642cert
-import pyconfig
+try:
+    import pyconfig
+except ImportError:
+    pyconfig = None
 
 NS = {'ds': 'http://www.w3.org/2000/09/xmldsig#'}
 NSDefault = {None: 'http://www.w3.org/2000/09/xmldsig#'}
 DS = ElementMaker(namespace=NS['ds'], nsmap=NSDefault)
 
 
-class Config(object):
-    """
-    This class holds a set of configuration parameters (using pyconfig) for pyXMLSecurity:
+if pyconfig:
 
-    :param default_signature_alg: The URI of the default signature algorithm (RSA_SHA1 by default)
-    :param default_digest_alg: The URI of the default digest algorithm (SHA1 by default)
-    :param default_c14n_alg: The URI of the default c14n algorithm (c14n exclusive by default)
-    :param debug_write_to_files: Set to True to dump certain XML traces to /tmp. Danger! Not for production!
-    :param same_document_is_root: Set to True to treat implicit null same-document-references as reference to the whole document.
-    :param id_attributes: A list of attributes to be used as 'id's. By default set to ['ID','id']
-    :param c14n_strip_ws: Set to True to strip whitespaces in c14n. Only use if you have very special needs.
 
-    Refer to the pyconfig documentation for information on how to override these in your own project.
-    """
-    default_signature_alg = pyconfig.setting("xmlsec.default_signature_alg", constants.ALGORITHM_SIGNATURE_RSA_SHA1)
-    default_digest_alg = pyconfig.setting("xmlsec.default_digest_alg", constants.ALGORITHM_DIGEST_SHA1)
-    default_c14n_alg = pyconfig.setting("xmlsec.default_c14n_alg", constants.TRANSFORM_C14N_INCLUSIVE)
-    debug_write_to_files = pyconfig.setting("xmlsec.config.debug_write_to_files", False)
-    same_document_is_root = pyconfig.setting("xmlsec.same_document_is_root", False)
-    id_attributes = pyconfig.setting("xmlsec.id_attributes", ['ID', 'id'])
-    c14n_strip_ws = pyconfig.setting("xmlsec.c14n_strip_ws", False)
+    class Config(object):
+        """
+        This class holds a set of configuration parameters (using pyconfig) for pyXMLSecurity:
+
+        :param default_signature_alg: The URI of the default signature algorithm (RSA_SHA1 by default)
+        :param default_digest_alg: The URI of the default digest algorithm (SHA1 by default)
+        :param default_c14n_alg: The URI of the default c14n algorithm (c14n exclusive by default)
+        :param debug_write_to_files: Set to True to dump certain XML traces to /tmp. Danger! Not for production!
+        :param same_document_is_root: Set to True to treat implicit null same-document-references as reference to the whole document.
+        :param id_attributes: A list of attributes to be used as 'id's. By default set to ['ID','id']
+        :param c14n_strip_ws: Set to True to strip whitespaces in c14n. Only use if you have very special needs.
+
+        Refer to the pyconfig documentation for information on how to override these in your own project.
+        """
+        default_signature_alg = pyconfig.setting("xmlsec.default_signature_alg", constants.ALGORITHM_SIGNATURE_RSA_SHA1)
+        default_digest_alg = pyconfig.setting("xmlsec.default_digest_alg", constants.ALGORITHM_DIGEST_SHA1)
+        default_c14n_alg = pyconfig.setting("xmlsec.default_c14n_alg", constants.TRANSFORM_C14N_INCLUSIVE)
+        debug_write_to_files = pyconfig.setting("xmlsec.config.debug_write_to_files", False)
+        same_document_is_root = pyconfig.setting("xmlsec.same_document_is_root", False)
+        id_attributes = pyconfig.setting("xmlsec.id_attributes", ['ID', 'id'])
+        c14n_strip_ws = pyconfig.setting("xmlsec.c14n_strip_ws", False)
+
+
+else:
+
+
+    class Config(object):
+        """
+        This class holds a set of configuration parameters (without using pyconfig) for pyXMLSecurity:
+
+        :param default_signature_alg: The URI of the default signature algorithm (RSA_SHA1 by default)
+        :param default_digest_alg: The URI of the default digest algorithm (SHA1 by default)
+        :param default_c14n_alg: The URI of the default c14n algorithm (c14n exclusive by default)
+        :param debug_write_to_files: Set to True to dump certain XML traces to /tmp. Danger! Not for production!
+        :param same_document_is_root: Set to True to treat implicit null same-document-references as reference to the whole document.
+        :param id_attributes: A list of attributes to be used as 'id's. By default set to ['ID','id']
+        :param c14n_strip_ws: Set to True to strip whitespaces in c14n. Only use if you have very special needs.
+
+        """
+        default_signature_alg = constants.ALGORITHM_SIGNATURE_RSA_SHA1
+        default_digest_alg = constants.ALGORITHM_DIGEST_SHA1
+        default_c14n_alg = constants.TRANSFORM_C14N_INCLUSIVE
+        debug_write_to_files = False
+        same_document_is_root = False
+        id_attributes = ['ID', 'id']
+        c14n_strip_ws = False
 
 
 config = Config()
