@@ -388,11 +388,18 @@ def _c14n(t, exclusive, with_comments, inclusive_prefix_list=None, schema=None):
     """
     xml_str = etree.tostring(t)
     doc = parse_xml(xml_str, remove_whitespace=config.c14n_strip_ws, remove_comments=not with_comments, schema=schema)
-    buf = etree.tostring(doc,
-                         method='c14n',
-                         exclusive=exclusive,
-                         with_comments=with_comments,
-                         inclusive_ns_prefixes=inclusive_prefix_list)
+    try:
+        buf = etree.tostring(doc,
+                             method='c14n',
+                             exclusive=exclusive,
+                             with_comments=with_comments,
+                             inclusive_ns_prefixes=inclusive_prefix_list)
+    except TypeError:
+        # Appengine lxml doesn't support "inclusive_ns_prefixes" yet.
+        buf = etree.tostring(doc,
+                             method='c14n',
+                             exclusive=exclusive,
+                             with_comments=with_comments)
     u = unescape_xml_entities(buf.decode("utf8", 'replace')).encode("utf8").strip()
     if u[0] != '<':
         raise XMLSigException("C14N buffer doesn't start with '<'")
